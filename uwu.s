@@ -21,6 +21,7 @@ uwuTreeR RN R1 ; register for storing the address of variable of current tree no
 uwuListValR RN R2 ; register for storing the value of current list address
 uwuTreeValR RN R3 ; register for storing the value of current tree node
 uwuCurrentTree RN R11 ; register that keep track of currentTreeAddress
+uwuCurrentHold RN R12 ; register to hold current value from node
 	
 ; for uwu BFS
 uwuSmallest RN R0 ; register for storing the current smallest value
@@ -81,13 +82,19 @@ uwuBFSsortInitialize
 	LDR uwuConstTree, =uwuTree
 	STR uwuConstTree, [uwuConstQueue] ; store the first node to queue
 uwuBFSsort
-	MOV R3, uwuCurrentTree
-	MOV R4, #uwuWord
+	MOV R3, uwuCurrentTree ; store the index of current tree node to R3
+	MOV R4, #uwuWord ; R4 = #4
 	MUL R5, R3, R4 ; the offset of current index (to determine which element in queue to access)
 	ADD R5, R5, uwuConstQueue ; the address of current element that BFS should be accessing
 
-	MOV R3, R5 ; copy the address of current element
-	LDR R3, [R3]
+	MOV R3, R5 ; copy the address of current element (in queue)
+	LDR R3, [R3] ; replace R3 to the address of the node in tree to access
+	LDR uwuCurrentHold, [R3] ; get the value of the tree
+	CMP uwuTakeAny, #1 ; see if any value can be considered as the smallest
+	MOVEQ uwuSmallest, uwuCurrentHold ; if uwuTakeAny == 1, then assign the uwuCurrentHold as smallest
+	MOVEQ uwuTakeAny, #0 ; set uwuTakeAny to 0 (no longer take any value)
+	BNE uwuCompare
+uwuAfterCompare
 	BL uwuCheck ; check for *left
 	BL uwuCheck ; check for *right
 	CMP uwuCurrentIndex, #uwuListSize
@@ -112,6 +119,11 @@ uwuAddNodeAddress
 	STR R4, [R5]
 	ADD uwuCurrentIndex, uwuCurrentIndex, #1 ; after we add a node to the queue, we increment by 1
 	B uwuCheckBack
+	
+uwuCompare
+	CMP uwuCurrentHold, uwuSmallest
+	MOVLT uwuSmallest, uwuCurrentHold
+	B uwuAfterCompare
 	
 uwuResetTraverse
 
