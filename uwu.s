@@ -10,8 +10,7 @@ uwuNextNode EQU 20 ; offset for next node
 uwuListSize EQU 15 ; the size of unsorted list
 
 ; general register
-uwuConstQueue RN R8 ; register for storing queue address
-uwuConstTree RN R9 ; constant register used to store the address of tree
+uwuConstQueue RN R9 ; register for storing queue address
 uwuCurrentIndex RN R10 ; R10 to keep track of the current element
 					   ; using RN associate a register with a name
 					   
@@ -21,12 +20,13 @@ uwuTreeR RN R1 ; register for storing the address of variable of current tree no
 uwuListValR RN R2 ; register for storing the value of current list address
 uwuTreeValR RN R3 ; register for storing the value of current tree node
 uwuCurrentTree RN R11 ; register that keep track of currentTreeAddress
-uwuCurrentHold RN R12 ; register to hold current value from node
 	
 ; for uwu BFS
 uwuSmallest RN R0 ; register for storing the current smallest value
 uwuTakeAny RN R1 ; determine if BFS should take the next value as smallest (foundation)
 uwuCurrentNode RN R11 ; determine the current address of node in queue (that needs to be traverse)
+uwuCurrentHold RN R12 ; register to hold current value from node / random things that need to be hold
+
 
 ; place root to tree uwu
 uwuPlaceTreeRoot
@@ -79,8 +79,8 @@ uwuBFSsortInitialize
 	MOV uwuCurrentIndex, #1 ; set value of current index to 1 (since we already have root as first element) (for queue, as in which index to add the next node)
 	MOV uwuCurrentTree, #0 ; reset value of current index (for tree, as in which tree BFS is accessing from queue)
 	LDR uwuConstQueue, =uwuQueue
-	LDR uwuConstTree, =uwuTree
-	STR uwuConstTree, [uwuConstQueue] ; store the first node to queue
+	LDR uwuCurrentHold, =uwuTree ; currently hold the address of first node of tree
+	STR uwuCurrentHold, [uwuConstQueue] ; store the first node to queue
 uwuBFSsort
 	MOV R3, uwuCurrentTree ; store the index of current tree node to R3
 	MOV R4, #uwuWord ; R4 = #4
