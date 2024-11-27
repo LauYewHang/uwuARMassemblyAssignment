@@ -10,6 +10,7 @@ uwuNextNode EQU 20 ; offset for next node
 uwuListSize EQU 15 ; the size of unsorted list
 
 ; general register
+uwuSortCount RN R8 ; count if sorted for 15 times (the number of array)
 uwuConstQueue RN R9 ; register for storing queue address
 uwuCurrentIndex RN R10 ; R10 to keep track of the current element
 					   ; using RN associate a register with a name
@@ -24,6 +25,7 @@ uwuCurrentTree RN R11 ; register that keep track of currentTreeAddress
 ; for uwu BFS
 uwuSmallest RN R0 ; register for storing the current smallest value
 uwuTakeAny RN R1 ; determine if BFS should take the next value as smallest (foundation)
+uwuSmallestAddress RN R2 ; used to store the previous recorded smallest address
 uwuCurrentNode RN R11 ; determine the current address of node in queue (that needs to be traverse)
 uwuCurrentHold RN R12 ; register to hold current value from node / random things that need to be hold
 
@@ -73,6 +75,7 @@ uwuCanStore
 	ADD uwuCurrentIndex, uwuCurrentIndex, #1 ; increment the index count
 	B uwuSortTree ; loop again for the next value in list
 
+
 ; BFS start here uwu
 uwuBFSsortInitialize
 	MOV uwuTakeAny, #1 ; at the start of traversing, it should been able to take on any value as the smallest
@@ -90,16 +93,31 @@ uwuBFSsort
 	MOV R3, R5 ; copy the address of current element (in queue)
 	LDR R3, [R3] ; replace R3 to the address of the node in tree to access
 	LDR uwuCurrentHold, [R3] ; get the value of the tree
-	CMP uwuTakeAny, #1 ; see if any value can be considered as the smallest
+	LDR R4, [R3, #uwuBlocked] ; check if this value has been taken
+	CMP R4, #0
+	CMPEQ uwuTakeAny, #1 ; see if any value can be considered as the smallest
 	MOVEQ uwuSmallest, uwuCurrentHold ; if uwuTakeAny == 1, then assign the uwuCurrentHold as smallest
 	MOVEQ uwuTakeAny, #0 ; set uwuTakeAny to 0 (no longer take any value)
+	MOVEQ uwuSmallestAddress, R3 ; now the smallest address is the one node being taken
 	BNE uwuCompare
 uwuAfterCompare
 	BL uwuCheck ; check for *left
 	BL uwuCheck ; check for *right
-	CMP uwuCurrentIndex, #uwuListSize
+	
 	ADD uwuCurrentTree, uwuCurrentTree, #1
+	CMP uwuCurrentTree, #uwuListSize
+	MOVEQ uwuCurrentHold, #1
+	STREQ uwuCurrentHold, [uwuSmallestAddress, #uwuBlocked]
 	BLT uwuBFSsort
+	
+	LDR uwuCurrentHold, =uwuSortedArray
+	MOV R3, #uwuWord
+	MOV R4, uwuSortCount
+	MUL R5, R3, R4
+	STR uwuSmallest, [uwuCurrentHold, R5]
+	ADD uwuSortCount, uwuSortCount, #1
+	CMP uwuSortCount, #uwuListSize
+	BLT uwuBFSsortInitialize
 	BGE uwuStop
 	
 uwuCheck
@@ -121,8 +139,10 @@ uwuAddNodeAddress
 	B uwuCheckBack
 	
 uwuCompare
-	CMP uwuCurrentHold, uwuSmallest
+	CMP R4, #0
+	CMPEQ uwuCurrentHold, uwuSmallest
 	MOVLT uwuSmallest, uwuCurrentHold
+	MOVLT uwuSmallestAddress, R3
 	B uwuAfterCompare
 	
 uwuResetTraverse
