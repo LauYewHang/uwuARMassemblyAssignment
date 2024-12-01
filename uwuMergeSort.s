@@ -30,8 +30,8 @@ uwuInitialize
 	BL uwuReadArray ; call the read array function
 	
 	MOV uwuHold, PC ; store current PC
-	ADD uwuHold, #8 ; offset 8 bytes (2 instructions) since we want to skip uwuHold and uwuMergeSort
-	PUSH {uwuHold}
+	ADD uwuHold, #8 ; offset 12 bytes (3 instructions) since we want to skip PUSH and uwuMergeSort
+	PUSH {uwuHold} ; store the PC so next time the last function POP it jumps back here uwu
 	B uwuMergeSort ; call mergeSort function
 	B uwuStop ; uwu stop
 	
@@ -48,17 +48,57 @@ uwuReadArray
 	BLT uwuReadArray ; repeat until indexFrom >= indexTo
 	BX LR ; branch back after completing the loop
 	
-uwuMergeSort
+uwuMergeSort ; uwuMergeSort function with parameters "left" & "right", uwuMergeSort(left, right)
 	CMP uwuLeft, uwuRight ; compare left and right
-	POPGE {PC} ; return to previous instruction's location if left >= right (return statement)
+	POPGE {uwuLeft, uwuMid, uwuRight, PC} ; return to previous instruction's location if left >= right (return statement)
 	
 	; sort left side
-	B uwuMergeSort
+	SUB uwuMid, uwuRight, uwuLeft
+	LSR uwuMid, uwuMid, #1 
+	ADD uwuMid, uwuLeft ; mid = left + (right-left) / 2
+	
+	MOV uwuHold, PC
+	ADD uwuHold, #16 ; current PC with 16 bytes offset since we want to skip 2 PUSH, 1 MOV, and first uwuMergeSort
+	
+	PUSH {uwuHold} ; save the PC address uwu
+	PUSH {uwuLeft, uwuMid, uwuRight} ; save the current left mid right value uwu
+	MOV uwuRight, uwuMid ; right = mid
+	B uwuMergeSort ; call uwuMergeSort with (left, mid)
+	
 	
 	; sort right side
-	B uwuMergeSort
+	MOV uwuHold, PC
+	ADD uwuHold, #20 ; current PC with 20 bytes offset since we want to skip 2 PUSH, 1 MOV, 1 ADD, 1 uwuMergeSort
+	
+	PUSH {uwuHold}
+	PUSH {uwuLeft, uwuMid, uwuRight}
+	
+	MOV uwuLeft, uwuMid
+	ADD uwuLeft, #1 ; left = mid + 1
+	B uwuMergeSort ; call uwuMergeSort with (mid+1, right)
+	
+	B uwuMerge ; merge the two array together uwu
 
 uwuMerge
+	; store to left array
+	LDR uwuReadFrom, =uwuSortedArray
+	LDR uwuWriteTo, =uwuLeftArray
+	MOV uwuIndexFrom, uwuLeft
+	MOV uwuIndexTo, uwuMid
+	BL uwuReadArray
+	
+	; store to right array
+	LDR uwuReadFrom, =uwuSortedArray
+	LDR uwuWriteTo, =uwuRightArray
+	MOV uwuIndexFrom, uwuMid
+	MOV uwuIndexTo, uwuRight
+	ADD uwuIndexTo, #1
+	BL uwuReadArray
+	
+	BL compare
+	
+compare
+	
 	
 ; uwu end
 uwuStop B uwuStop	
