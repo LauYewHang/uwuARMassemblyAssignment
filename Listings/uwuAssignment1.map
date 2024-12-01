@@ -15,9 +15,9 @@ Image Symbol Table
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    uwuCode                                  0x00000000   Section      284  uwumergesort.o(uwuCode)
+    uwuCode                                  0x00000000   Section      496  uwumergesort.o(uwuCode)
     uwuMergeSort.s                           0x00000000   Number         0  uwumergesort.o ABSOLUTE
-    uwuUnsortedArray                         0x000000d8   Data          40  uwumergesort.o(uwuCode)
+    uwuUnsortedArray                         0x000001a0   Data          40  uwumergesort.o(uwuCode)
     uwuMemory                                0x60000000   Section     4216  uwumergesort.o(uwuMemory)
     uwuStackMemory                           0x60000000   Data        4096  uwumergesort.o(uwuMemory)
     uwuLeftArray                             0x60001000   Data          40  uwumergesort.o(uwuMemory)
@@ -38,23 +38,23 @@ Memory Map of the image
 
   Image Entry point : 0x00000000
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00001194, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00001268, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x0000011c, Max: 0xffffffff, ABSOLUTE)
-
-    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x00000000   0x00000000   0x0000011c   Code   RO            1  * uwuCode             uwumergesort.o
-
-
-    Execution Region ER_RW (Exec base: 0x60000000, Load base: 0x0000011c, Size: 0x00001078, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x000001f0, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x60000000   0x0000011c   0x00001078   Data   RW            2    uwuMemory           uwumergesort.o
+    0x00000000   0x00000000   0x000001f0   Code   RO            1  * uwuCode             uwumergesort.o
 
 
-    Execution Region ER_ZI (Exec base: 0x60001078, Load base: 0x00001194, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x60000000, Load base: 0x000001f0, Size: 0x00001078, Max: 0xffffffff, ABSOLUTE)
+
+    Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x60000000   0x000001f0   0x00001078   Data   RW            2    uwuMemory           uwumergesort.o
+
+
+    Execution Region ER_ZI (Exec base: 0x60001078, Load base: 0x00001268, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
 
     **** No section assigned to this execution region ****
 
@@ -66,10 +66,10 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       284         68          0       4216          0        304   uwumergesort.o
+       496         80          0       4216          0        356   uwumergesort.o
 
     ----------------------------------------------------------------------
-       284         68          0       4216          0        304   Object Totals
+       496         80          0       4216          0        356   Object Totals
          0          0          0          0          0          0   (incl. Generated)
          0          0          0          0          0          0   (incl. Padding)
 
@@ -84,15 +84,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-       284         68          0       4216          0        304   Grand Totals
-       284         68          0       4216          0        304   ELF Image Totals
-       284         68          0       4216          0          0   ROM Totals
+       496         80          0       4216          0        356   Grand Totals
+       496         80          0       4216          0        356   ELF Image Totals
+       496         80          0       4216          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                  284 (   0.28kB)
+    Total RO  Size (Code + RO Data)                  496 (   0.48kB)
     Total RW  Size (RW Data + ZI Data)              4216 (   4.12kB)
-    Total ROM Size (Code + RO Data + RW Data)       4500 (   4.39kB)
+    Total ROM Size (Code + RO Data + RW Data)       4712 (   4.60kB)
 
 ==============================================================================
 
